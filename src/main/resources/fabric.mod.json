@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "skilltreemc",
+  "version": "${version}",
+  "name": "Skill Tree MC",
+  "description": "Adds a skill tree with three paths (Combat, Utils, Support/Spells) to Minecraft. Uses XP as skill points.",
+  "authors": [
+    "LANGEBE"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Galaxystudiogames/SKILLTREEMC",
+    "sources": "https://github.com/Galaxystudiogames/SKILLTREEMC"
+  },
+  "license": "GPL-3.0-or-later",
+  "icon": "assets/skilltreemc/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "org.langebe.skilltreemc.SkillTreeMC"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  },
+  "mixins": [
+    "skilltreemc.mixins.json"
+  ]
+}

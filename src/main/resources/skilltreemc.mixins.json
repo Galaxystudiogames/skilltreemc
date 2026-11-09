@@ -1,0 +1,23 @@
+{
+  "required": true,
+  "package": "org.langebe.skilltreemc.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "mixins": [
+    "FoodPropertiesMixin",
+    "IngredientMixin",
+    "ItemCostMixin",
+    "ItemStackMixin",
+    "LivingEntityMixin",
+    "PlayerMixin",
+    "PotionContentsMixin",
+    "ServerGamePacketListenerMixin",
+    "ServerPlayerMixin",
+    "ThrownSplashPotionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
