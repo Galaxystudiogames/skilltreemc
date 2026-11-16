@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Utils path mechanics that are not simple attributes/effects:
  * <ul>
- *   <li><b>Swift Feet</b> – Speed while not in combat.</li>
+ *   <li><b>Swift Feet</b> – Speed while not in combat (from the L15 upgrade on: always).</li>
  *   <li><b>Scavenger</b> – chance for every mob drop to drop twice.</li>
  *   <li>Loot hook for <b>Midas Touch</b> (see {@link UtilityPassives}).</li>
  * </ul>
@@ -60,7 +60,8 @@ public final class UtilityMechanics {
         }
         for (ServerPlayer player : server.getPlayerList().getPlayers()) {
             int level = (int) SkillManager.getStat(player, Stat.SWIFT_FEET);
-            if (level > 0 && player.isAlive() && !CombatTracker.inCombat(player)) {
+            boolean always = SkillManager.getStat(player, Stat.SWIFT_FEET_COMBAT) > 0;
+            if (level > 0 && player.isAlive() && (always || !CombatTracker.inCombat(player))) {
                 player.addEffect(new MobEffectInstance(MobEffects.SPEED, SWIFT_FEET_TICKS, level - 1, true, false, true));
             }
         }

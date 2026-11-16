@@ -93,7 +93,7 @@ At the **split** (level 5) you choose one of two branches. The other branch is l
 
 ### Combat
 
-PvP-focused. Crit chance, crits, stun and the Rage extension only work on **melee hits**.
+PvP-focused. Crit chance, crits, stun and the Rage extension only work on **melee hits** – with any weapon or the fist, including the mace smash attack and the spear, but not arrows, thrown tridents or spells. A killing blow counts as a hit too (crit effect, Rage extension).
 
 | Level | Content |
 |-------|---------|
@@ -105,7 +105,7 @@ PvP-focused. Crit chance, crits, stun and the Rage extension only work on **mele
 
 | DPS | | Tank | |
 |---|---|---|---|
-| L6–7, L9–14 | Crit Rate 6 → 13 %, Multiplier 10 → 30 %, Glowing 2 / 2.5 / 3 s (L7 / L10 / L13) | L6–7, L9–14 | Reduction Rate 6 → 13 %, Percent 10 → 30 %, Glowing like DPS |
+| L6–7, L9–14 | Crit Rate 7 → 25 %, Multiplier 10 → 30 %, Reduction Rate 6 → 10 %, Glowing 2 / 2.5 / 3 s (L7 / L10 / L13) | L6–7, L9–14 | Reduction Rate 7 → 25 %, Percent 10 → 30 %, Crit Rate 6 → 10 %, Glowing like DPS |
 | L6, L9, L11, L14 | **+1 heart** each (+4 total) | L6–7, L9–15 | **+1 heart** each (+9 total) |
 | L8 | **Stun**: 4 % per hit, 2.5 s unable to move and skills locked, 8 s internal cooldown | L8 | **Living Immortal**: below 2 hearts, 25 % chance for Resistance 10 + Regeneration 10 (2 s), 40 s cooldown; also saves you from a lethal hit |
 | L15 | **Rage** (toggle): Speed II + 100 % crit rate, 10 s base duration, every hit extends it by 80 % of the time since the last hit, 2.5 min cooldown | L15 | **Shield** (toggle): every hit is reduced, Reduction +10 %, 8 s, 2 min cooldown |
@@ -181,6 +181,7 @@ All-rounder without a hard split. From L6 on you pick **one** of 2–3 options p
 | L13, L17, L21 | choice of L8 (Eagle Eye / Smoke Screen / Midas Touch) |
 | L14, L18, L22 | choice of L9 (Phase Dash / Fortify) |
 | L15, L19, L23 | choice of L10 (Tracker / Ambush / Tinker) |
+| L15 | **Swift Feet** stays active in combat |
 
 The individual upgrade texts are in the tooltip of each upgrade level and use the values from the design document. The numbers live in `SkillTreeConfig.java` (section *Utils choice perks*) as arrays per upgrade tier.
 
@@ -320,8 +321,8 @@ The design document leaves these values open. They were chosen to fit the given 
 | Area | Value | Reasoning |
 |---|---|---|
 | Cost curve | `2 × 1.15^(L−1)` (Utils `× 1.11`) → Combat L15 ≈ 14, Support L18 ≈ 21, Utils L23 ≈ 20 XP levels | a whole path ≈ late-game grind, single levels stay affordable |
-| Combat DPS L6–14 | Crit Rate 6, 7, 8 … 13 %; Multiplier 10, 12, 15, 18, 20, 22, 25, 30 % | +1 % rate per level like L1→L3; the multiplier grows faster so crits are noticeable |
-| Combat Tank L6–14 | Reduction Rate 6 → 13 %, Percent 10 → 30 % | mirrors DPS |
+| Combat DPS L6–14 | Crit Rate 7, 10, 12, 15, 17, 20, 22, 25 %; Multiplier 10, 12, 15, 18, 20, 22, 25, 30 %; Reduction Rate 6, 6, 7, 7, 8, 8, 9, 10 % | 25 % crit rate at max level; the off-branch stat (reduction) ends at 10 % and keeps the L3 percent (7 %) |
+| Combat Tank L6–14 | Reduction Rate 7 → 25 %, Percent 10 → 30 %; Crit Rate 6 → 10 % | mirrors DPS (crit multiplier stays at the L3 value, 7 %) |
 | Combat Sense | 1.5 s (L4), 2 / 2.5 / 3 s (L7 / L10 / L13) | "short", but upgrades are noticeable |
 | Stun | 4 % | middle of "3–5 %" |
 | Living Immortal | 25 % proc chance | rare with a 40 s cooldown, but reliable enough |

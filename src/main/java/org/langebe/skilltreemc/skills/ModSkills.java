@@ -48,6 +48,7 @@ import static org.langebe.skilltreemc.core.Stat.SHIELD;
 import static org.langebe.skilltreemc.core.Stat.SPELL_SLOTS;
 import static org.langebe.skilltreemc.core.Stat.STUN_CHANCE;
 import static org.langebe.skilltreemc.core.Stat.SWIFT_FEET;
+import static org.langebe.skilltreemc.core.Stat.SWIFT_FEET_COMBAT;
 import static org.langebe.skilltreemc.data.SkillPath.COMBAT;
 import static org.langebe.skilltreemc.data.SkillPath.SUPPORT;
 import static org.langebe.skilltreemc.data.SkillPath.UTILITY;
@@ -81,7 +82,9 @@ public final class ModSkills {
     private static final Setting GLOW = tiers("skill.combat.glow_seconds",
             "Combat Sense glowing seconds at L4 / L7 / L10 / L13 (chosen)", 1.5, 2, 2.5, 3);
     private static final Setting DPS_CRIT_RATE = tiers("skill.combat.dps.crit_rate",
-            "DPS Crit Rate at L6, L7, L9–L14 (chosen)", 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13);
+            "DPS Crit Rate at L6, L7, L9–L14 (25% at max level)", 0.07, 0.10, 0.12, 0.15, 0.17, 0.20, 0.22, 0.25);
+    private static final Setting DPS_REDUCTION_RATE = tiers("skill.combat.dps.reduction_rate",
+            "DPS Reduction Rate at L6, L7, L9–L14 (10% at max level)", 0.06, 0.06, 0.07, 0.07, 0.08, 0.08, 0.09, 0.10);
     private static final Setting DPS_CRIT_MULTIPLIER = tiers("skill.combat.dps.crit_multiplier",
             "DPS Crit Multiplier at L6, L7, L9–L14 (chosen)", 0.10, 0.12, 0.15, 0.18, 0.20, 0.22, 0.25, 0.30);
     private static final Setting DPS_HEARTS = tiers("skill.combat.dps.extra_hearts",
@@ -92,7 +95,9 @@ public final class ModSkills {
     private static final Setting DPS_STUN_CHANCE = number("skill.combat.dps.stun_chance", 0.04,
             "Stun chance per hit (doc: 3–5%)");
     private static final Setting TANK_REDUCTION_RATE = tiers("skill.combat.tank.reduction_rate",
-            "Tank Reduction Rate at L6, L7, L9–L14 (chosen)", 0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13);
+            "Tank Reduction Rate at L6, L7, L9–L14 (25% at max level)", 0.07, 0.10, 0.12, 0.15, 0.17, 0.20, 0.22, 0.25);
+    private static final Setting TANK_CRIT_RATE = tiers("skill.combat.tank.crit_rate",
+            "Tank Crit Rate at L6, L7, L9–L14 (10% at max level)", 0.06, 0.06, 0.07, 0.07, 0.08, 0.08, 0.09, 0.10);
     private static final Setting TANK_REDUCTION_PERCENT = tiers("skill.combat.tank.reduction_percent",
             "Tank Reduction Percent at L6, L7, L9–L14 (chosen)", 0.10, 0.12, 0.15, 0.18, 0.20, 0.22, 0.25, 0.30);
     private static final Setting TANK_IMMORTAL_CHANCE = number("skill.combat.tank.immortal_chance", 0.25,
@@ -146,7 +151,7 @@ public final class ModSkills {
         add(node("combat.dps.l5", COMBAT, 5, "DPS", Items.NETHERITE_SWORD)
                 .requires("combat.l4").exclusiveGroup("combat.branch")
                 .description("Damage branch: crits, Stun, Rage"));
-        // L6–7, L9–14: stat upgrades (values: DPS_CRIT_RATE / DPS_CRIT_MULTIPLIER / GLOW)
+        // L6–7, L9–14: stat upgrades (values: DPS_CRIT_RATE / DPS_CRIT_MULTIPLIER / DPS_REDUCTION_RATE / GLOW)
         dpsStats(6, 1, 0);
         hearts(DPS_HEARTS, 1, "combat.dps.l6");
         dpsStats(7, 2, 2);
@@ -177,7 +182,7 @@ public final class ModSkills {
         add(node("combat.tank.l5", COMBAT, 5, "Tank", Items.NETHERITE_CHESTPLATE)
                 .requires("combat.l4").exclusiveGroup("combat.branch")
                 .description("Defense branch: damage reduction, Living Immortal, Shield"));
-        // L6–7, L9–14: stat upgrades (values: TANK_REDUCTION_RATE / TANK_REDUCTION_PERCENT / GLOW)
+        // L6–7, L9–14: stat upgrades (values: TANK_REDUCTION_RATE / TANK_REDUCTION_PERCENT / TANK_CRIT_RATE / GLOW)
         tankStats(6, 1, 0);
         hearts(TANK_HEARTS, 1, "combat.tank.l6");
         tankStats(7, 2, 2);
@@ -228,7 +233,8 @@ public final class ModSkills {
     private static void dpsStats(int level, int index, int glowTier) {
         Skill skill = node("combat.dps.l" + level, COMBAT, level, "Stat Upgrade", Items.REDSTONE)
                 .requires("combat.dps.l" + (level - 1))
-                .stat(CRIT_RATE, DPS_CRIT_RATE, index).stat(CRIT_MULTIPLIER, DPS_CRIT_MULTIPLIER, index);
+                .stat(CRIT_RATE, DPS_CRIT_RATE, index).stat(CRIT_MULTIPLIER, DPS_CRIT_MULTIPLIER, index)
+                .stat(REDUCTION_RATE, DPS_REDUCTION_RATE, index);
         if (glowTier > 0) {
             skill.stat(GLOW_SECONDS, GLOW, glowTier);
         }
@@ -239,7 +245,8 @@ public final class ModSkills {
     private static void tankStats(int level, int index, int glowTier) {
         Skill skill = node("combat.tank.l" + level, COMBAT, level, "Stat Upgrade", Items.IRON_INGOT)
                 .requires("combat.tank.l" + (level - 1))
-                .stat(REDUCTION_RATE, TANK_REDUCTION_RATE, index).stat(REDUCTION_PERCENT, TANK_REDUCTION_PERCENT, index);
+                .stat(REDUCTION_RATE, TANK_REDUCTION_RATE, index).stat(REDUCTION_PERCENT, TANK_REDUCTION_PERCENT, index)
+                .stat(CRIT_RATE, TANK_CRIT_RATE, index);
         if (glowTier > 0) {
             skill.stat(GLOW_SECONDS, GLOW, glowTier);
         }
@@ -423,6 +430,9 @@ public final class ModSkills {
                 "Tracker: shows distance + HP",
                 "Ambush: +{utils.ambush.bonus@2%}% damage + Poison {utils.ambush.poison_seconds}s",
                 "Tinker: → {utils.tinker.save@2%}%");
+        // Swift Feet no longer drops in combat from here on.
+        SkillRegistry.get("utility.l15").stat(SWIFT_FEET_COMBAT, 1)
+                .addDescription("Swift Feet: now also active in combat");
         upgrade(16, null, new Stat[]{TIER_L7}, new int[]{3},
                 "Potion Mastery: splash potions hit you at full strength",
                 "Iron Gut: food gives {utils.iron_gut.saturation_bonus%}% more saturation");

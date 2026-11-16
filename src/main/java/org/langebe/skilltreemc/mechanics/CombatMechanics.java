@@ -55,6 +55,7 @@ public final class CombatMechanics {
 
     public static void register() {
         ServerLivingEntityEvents.AFTER_DAMAGE.register(CombatMechanics::afterDamage);
+        ServerLivingEntityEvents.AFTER_DEATH.register(CombatMechanics::afterDeath);
         ServerLivingEntityEvents.ALLOW_DEATH.register(CombatMechanics::allowDeath);
         ServerTickEvents.END_SERVER_TICK.register(server -> PENDING.clear());
         ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> CombatTracker.forget(handler.player));
@@ -116,18 +117,7 @@ public final class CombatMechanics {
 
     /** Side effects of the procs rolled in {@link #modifyDamage}, once the hit has landed. */
     private static void applyProcs(LivingEntity victim, PendingHit hit) {
-        if (hit.attacker != null) {
-            if (hit.crit) {
-                Fx.crit(hit.attacker, victim);
-                // During Rage every hit crits – no message spam then.
-                if (!hit.rage) {
-                    Feedback.proc(hit.attacker, "✦ CRIT +" + Math.round(hit.critMultiplier * 100) + "%", ChatFormatting.RED);
-                }
-            }
-            if (hit.ambushBonus > 0) {
-                UtilityPassives.consumeAmbush(hit.attacker, victim, hit.ambushBonus);
-            }
-        }
+        applyAttackerProcs(victim, hit);
         if (victim instanceof ServerPlayer player) {
             if (hit.crit) {
                 UtilityPassives.onCritReceived(player);
@@ -137,6 +127,45 @@ public final class CombatMechanics {
                 // Shield blocks every hit – only announce the random procs.
                 if (!hit.shield) {
                     Feedback.proc(player, "⛨ BLOCK -" + Math.round(hit.reductionPercent * 100) + "%", ChatFormatting.AQUA);
+                }
+            }
+        }
+    }
+
+    /** Attacker-side procs (crit effect, Ambush) – also run for killing blows. */
+    private static void applyAttackerProcs(LivingEntity victim, PendingHit hit) {
+        if (hit.attacker == null) {
+            return;
+        }
+        if (hit.crit) {
+            Fx.crit(hit.attacker, victim);
+            // During Rage every hit crits – no message spam then.
+            if (!hit.rage) {
+                Feedback.proc(hit.attacker, "✦ CRIT +" + Math.round(hit.critMultiplier * 100) + "%", ChatFormatting.RED);
+            }
+        }
+        if (hit.ambushBonus > 0) {
+            UtilityPassives.consumeAmbush(hit.attacker, victim, hit.ambushBonus);
+        }
+    }
+
+    /**
+     * Killing blows: Fabric does not fire AFTER_DAMAGE when the victim dies, so the
+     * attacker-side effects of the hit (crit feedback, Ambush use, combat tag, Rage extension)
+     * are handled here.
+     */
+    private static void afterDeath(LivingEntity victim, DamageSource source) {
+        PendingHit hit = PENDING.remove(victim);
+        if (hit != null && hit.source == source) {
+            applyAttackerProcs(victim, hit);
+        }
+        if (source.getEntity() instanceof ServerPlayer attacker && attacker != victim) {
+            CombatTracker.tag(attacker);
+            if (isMelee(source)) {
+                ActiveAbilities.onHit(attacker);
+                UtilityPassives.onAttack(attacker);
+                if (victim instanceof Player) {
+                    UtilityActives.onPlayerHit(attacker);
                 }
             }
         }
@@ -220,8 +249,10 @@ public final class CombatMechanics {
         return true;
     }
 
-    /** Direct melee hit by a player (no arrows, spells, thorns, ...). */
+    /** Direct melee hit by a player, incl. mace smash and spear (no arrows, spells, thorns, ...). */
     private static boolean isMelee(DamageSource source) {
-        return source.is(DamageTypes.PLAYER_ATTACK) && source.getDirectEntity() == source.getEntity();
+        boolean meleeType = source.is(DamageTypes.PLAYER_ATTACK) || source.is(DamageTypes.MACE_SMASH)
+                || source.is(DamageTypes.SPEAR);
+        return meleeType && source.getDirectEntity() == source.getEntity();
     }
 }

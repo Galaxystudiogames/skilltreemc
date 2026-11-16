@@ -41,6 +41,8 @@ public enum Stat {
     // ----- Utils -------------------------------------------------------------------
     /** Swift Feet: Speed level outside of combat (1 = Speed I). */
     SWIFT_FEET("Swift Feet Speed", false),
+    /** 1 = Swift Feet also works in combat (later Utils upgrade). */
+    SWIFT_FEET_COMBAT("Swift Feet in Combat", false, true),
     /** Scavenger: chance for each mob drop to drop twice. */
     DROP_BONUS("Extra Mob Drops", true),
 
