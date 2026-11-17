@@ -2,8 +2,6 @@
 
 A server-side Fabric mod for SMP servers. Players level up in three **paths** (Combat, Utils, Support/Spells), one level at a time, and pay with their **XP levels**. Combat and Support split into two branches at level 5.
 
-Built from the design document *"Skill System — SMP Mod"* (HTML version, including the Utils choice levels). Values the document leaves open were chosen to fit the surrounding numbers (see [Chosen values](#chosen-values)). **Every balance value is configurable**: in `config/skilltreemc.json` or in-game with `/st admin config` (see [Configuration](#configuration)).
-
 ## Contents
 
 - [Installation](#installation)
